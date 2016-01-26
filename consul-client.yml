@@ -10,10 +10,9 @@ consul-init:
     io.rancher.os.scope: system
 
 consul-server:
-  image: gliderlabs/consul-server:0.6
+  image: gliderlabs/consul-agent:0.6
   restart: always
   command: >
-    -bootstrap-expect 3
     -datacenter us-east-1
   net: host
   volumes:
