@@ -1,0 +1,35 @@
+consul-server-init:
+  image: docker:1.9-dind
+  command: docker volume create --name=consul
+  privileged: true
+  volumes:
+    - /var/run/system-docker.sock:/var/run/docker.sock
+  labels:
+    io.rancher.os.after: docker
+    io.rancher.os.detach: false
+    io.rancher.os.scope: system
+
+consul-server:
+  image: gliderlabs/consul-server:0.6
+  restart: always
+  command: >
+    -bootstrap-expect 3
+    -datacenter us-east-1
+  net: host
+  volumes:
+    - consul:/data
+  labels:
+    io.rancher.os.after: consul-init
+    io.rancher.os.detach: true
+    io.rancher.os.scope: system
+
+dnsmasq:
+  image: andyshinn/dnsmasq:2.75
+  command: -S /consul/127.0.0.1#8600
+  net: host
+  cap_add:
+    - NET_ADMIN
+  labels:
+    io.rancher.os.after: docker
+    io.rancher.os.detach: true
+    io.rancher.os.scope: system
